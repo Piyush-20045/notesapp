@@ -1,0 +1,139 @@
+FLUTTER + DART: ESSENTIAL NOTES
+================================
+
+1. REACT TO FLUTTER MENTAL MODEL
+--------------------------------
+- Widget = React component.
+- build() = render function.
+- Constructor arguments = props.
+- StatefulWidget + State = local component state.
+- setState() changes local state and schedules a rebuild.
+- ChangeNotifier = a small observable store for shared/feature state.
+- ListenableBuilder = rebuilds UI when a Listenable changes.
+- Future<T> = Promise<T>; async/await work similarly to TypeScript.
+- pubspec.yaml = package.json (dependencies, assets, fonts, app version).
+- lib/main.dart = app entry point.
+- Everything visible is a widget: text, padding, rows, screens, buttons.
+
+2. DART BASICS
+--------------
+- final: assigned once at runtime. Prefer it for variables that do not change.
+- const: compile-time constant. Prefer const widgets when possible.
+- var: Dart infers the type; the variable still has a fixed type.
+- String? means nullable; String means it cannot be null.
+- Use named parameters: Note(title: 'Work', body: 'Call client').
+- required makes a named parameter mandatory.
+- _name is library-private in Dart.
+- Lists use List<T>; maps use Map<K, V>.
+- Classes should usually be immutable: final fields + const constructor.
+- Use == for value comparison; use identical() only for object identity.
+- Await asynchronous storage/network work and handle its errors.
+
+3. CORE FLUTTER CONCEPTS
+------------------------
+- StatelessWidget: output depends only on inputs; it owns no changing UI state.
+- StatefulWidget: has short-lived local UI state such as form input or animation.
+- BuildContext: a widget's location in the widget tree; used for Theme, Navigator,
+  MediaQuery, dialogs, and inherited dependencies. Do not store it long-term.
+- build() can run often. Keep it fast and free of API/storage side effects.
+- Keys identify widgets when lists reorder or widget positions change.
+- dispose() controllers, focus nodes, streams, and animation controllers you own.
+- A rebuild is normal; Flutter efficiently updates only changed render objects.
+
+4. COMMON LAYOUT WIDGETS
+------------------------
+- Scaffold: basic page structure (app bar, body, floating button).
+- SafeArea: avoids notches and system UI.
+- Padding / SizedBox: spacing.
+- Row / Column: horizontal / vertical flex layout.
+- Expanded / Flexible: allocate remaining flex space.
+- ListView: scrollable list. Use ListView.builder for dynamic/large lists.
+- Center / Align: position one child.
+- LayoutBuilder: adapt to the actual available width.
+- TextField: text input; usually controlled with TextEditingController.
+
+Avoid fixed screen widths. Test narrow phones, landscape, tablets, resized web,
+large text, long content, and the on-screen keyboard.
+
+5. STATE RULES
+--------------
+- Keep temporary UI state in the widget (selected tab, controller, focus).
+- Keep feature/business state in a view model.
+- Keep stored data in a repository, the single source of truth.
+- Views display state and forward user actions; they should not contain storage
+  or business rules.
+- Start with Flutter's built-in setState/ChangeNotifier/ListenableBuilder.
+  Add Riverpod/Bloc only when project complexity creates a real need.
+
+6. NOTES APP ARCHITECTURE
+-------------------------
+lib/
+  main.dart                         App entry point
+  app/app.dart                      MaterialApp and dependency wiring
+  app/theme/app_theme.dart          Colors, typography, component themes
+  features/notes/domain/note.dart   Immutable Note model
+  features/notes/data/              Local service + repository
+  features/notes/presentation/      Screens, widgets, and view model
+
+Data flow:
+  Screen -> ViewModel -> Repository -> Local service
+  Screen <- UI state  <- Repository <- Stored data
+
+Use constructor injection so dependencies are visible and tests can replace
+them. Do not add a use-case/domain-service layer until logic is complex or reused.
+
+7. NAVIGATION AND STYLING
+-------------------------
+- MaterialApp is the app shell and owns theme/navigation configuration.
+- ThemeData centralizes colors and typography; avoid random styles per widget.
+- Navigator.push opens a screen; Navigator.pop closes it or returns a result.
+- Built-in Navigator is enough for this two-screen app. Consider go_router only
+  when deep links, web URL routing, or many guarded routes are required.
+
+8. PROJECT AND DAILY COMMANDS
+-----------------------------
+Run commands inside the actual Flutter project:
+  cd /home/piyush/Projects/learn-flutter/notesapp/notesapp
+
+  flutter doctor -v        Check development toolchains
+  flutter devices          List runnable targets
+  flutter pub get          Install dependencies
+  flutter run -d chrome    Run the web app
+  flutter analyze          Find static/type/lint problems
+  flutter test             Run tests
+  dart format lib test     Format Dart source and tests
+  flutter clean            Clear generated builds (use only for build issues)
+
+While flutter run is active:
+  r = hot reload (keeps state)
+  R = hot restart (resets app state)
+  q = stop
+
+9. TESTING MINIMUM
+------------------
+- Unit test models, repositories, and view-model behavior.
+- Widget test empty, loading, error, list, create, edit, and delete states.
+- Verify notes survive app restart after persistence is added.
+- Test blank input, long text, Unicode/emoji, rapid taps, and unsaved changes.
+- Manually test Chrome and a real/emulated Android device.
+- Before considering work complete: format, analyze, test, then manually run.
+
+10. PRACTICES TO REMEMBER
+-------------------------
+- Prefer small reusable widgets and descriptive names.
+- Prefer const and final; avoid mutable global state.
+- Never perform storage/network calls directly inside build().
+- Show loading, empty, error, and success states.
+- Do not ignore analyzer warnings without understanding them.
+- Add packages only when they solve a specific problem; check platform support.
+- Keep platform folders mostly generated; application code belongs in lib/.
+- Do not edit generated build output or commit secrets.
+
+CURRENT MACHINE STATUS (15 OCT 2026)
+------------------------------------
+- Flutter 3.47.7 and Dart 3.13.5 are installed.
+- Chrome/web target works, so development can start now.
+- Flutter's bin directory still needs to be added to PATH.
+- Android SDK command-line tools are missing.
+- Linux desktop needs clang, cmake, ninja-build, and pkg-config.
+- iOS builds require macOS/Xcode; Windows desktop builds require Windows.
